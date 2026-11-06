@@ -1,0 +1,5 @@
+const CACHE='right-ankle-atlas-v2';
+const ESSENTIAL=['./','./index.html','./style.css','./app.js','./renderer.js','./anatomy.js','./joints.js','./model.js','./tendons.js','./ligaments.js','./vendor/three.module.js','./vendor/three.core.js','./vendor/OrbitControls.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon.svg','./README.md','./vendor/LICENSE-three.txt'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ESSENTIAL)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('right-ankle-atlas-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==location.origin)return;const allowed=ESSENTIAL.map(p=>new URL(p,self.registration.scope).pathname);if(!allowed.includes(url.pathname))return;event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request)));});
